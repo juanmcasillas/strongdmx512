@@ -4,7 +4,8 @@ This project targets to replace the DIGIBOX REMOTE CONTROL software installed on
 
 After some investigation,  the protocol is DMX512, a variant over RS845 protocol used for manage lights and so on.
 [I found some specific info about strong's board](http://www.strong.es/upfiles/productes/fitxers/A316890026.pdf)
-There's also some [implementations](https://github.com/tigoe/sACNSource) for arduino.
+There's also some [implementations](https://github.com/tigoe/sACNSource) for arduino. The motor control box is a
+[Motor Digi BOX from strong](http://www.strong.es/producto.asp?strong=0&stage=1&id=237).
 
 ## Configuration
 
