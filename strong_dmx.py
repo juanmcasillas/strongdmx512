@@ -15,7 +15,11 @@
  
 import os
 import copy
-from pprint import pprint
+import socket
+import time
+
+from hexdump import hexdump
+
 class DMXPacket:
 
     # 0000  44 4d 58 35 31 32 2d 02  00 01 00 02 00 ff 00 ff   DMX512-· ········
@@ -44,59 +48,24 @@ class DMXPacket:
         'none': bytearray.fromhex('00 ff'),
     }
 
-    
-
-
     def __init__(self):
         pass
 
-    def hexdump(src: bytes, bytesPerLine: int = 16, bytesPerGroup: int = 2, asciiPerGroup: int = 4, sep: str = '.', joinlines: bool = True):
-        FILTER = ''.join([(len(repr(chr(x))) == 3) and chr(x) or sep for x in range(256)])
-        lines = []
-        maxAddrLen = len(hex(len(src)))
-        if 8 > maxAddrLen:
-            maxAddrLen = 8
-
-        for addr in range(0, len(src), bytesPerLine):
-            hexString = ""
-            printable = ""
-
-            # The chars we need to process for this line
-            chars = src[addr : addr + bytesPerLine]
-
-            # Create hex string
-            tmp = ''.join(['{:02x}'.format(x) for x in chars]) ## X means uppercase
-            idx = 0
-            for c in tmp:
-                hexString += c
-                idx += 1
-                # 2 hex digits per byte.
-                if idx % bytesPerGroup * 2 == 0 and idx < bytesPerLine * 2:
-                    hexString += " "
-            # Pad out the line to fill up the line to take up the right amount of space to line up with a full line.
-            hexString = hexString.ljust(bytesPerLine * 2 + int(bytesPerLine * 2 / bytesPerGroup) - 1)
-
-            # create printable string
-            tmp = ''.join(['{}'.format((x <= 127 and FILTER[x]) or sep) for x in chars])
-            # insert space every asciiPerGroup
-            idx = 0
-            for c in tmp:
-                printable += c
-                idx += 1
-                # Need to check idx because strip() would also delete genuine spaces that are in the data.
-                if idx % asciiPerGroup == 0 and idx < len(chars):
-                    printable += " "
-
-            lines.append(f'{addr:0{maxAddrLen}X}  {hexString}  |{printable}|')
-        
-        if not joinlines:
-            return lines
-        return os.linesep.join(lines)
+   
 
     def empty():
         return copy.copy(DMXPacket.empty_packet)
 
-    def cmd(indexes, cmd_str):
+    def cmd(cmd_str, indexes):
+        """Generate the proper package configured on DMXPacket.commands. If no indexes, return empty packet
+
+        Args:
+            cmd_str (_type_): _description_
+            indexes (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         pkg = copy.copy(DMXPacket.empty_packet)
 
         for index in indexes:
@@ -113,26 +82,89 @@ class DMXPacket:
     def none(indexes): return DMXPacket.cmd(indexes, "none")
 
 
+class LampClient:
+    def __init__(
+            self, 
+            src_addr: str = "192.168.72.228",
+            dst_addr: str = "192.168.72.226",
+            dst_port: int = 53704,
+            fps: int = 8,
+            socket_timeout: int = 1.0
+        ):
+        self.src_addr = src_addr
+        self.dst_addr = dst_addr
+        self.dst_port = dst_port
+        self.fps = fps
+        self.socket_timeout = socket_timeout
+
+        self.socket = None
+
+    def send_cmd(
+            self,
+            cmd: str = "none",
+            addrs: list = []
+        ):
+
+        if not self.socket:
+            raise IOError("Socket not connected")
+        addr = (self.dst_addr, self.dst_port)
+
+        
+        packet = DMXPacket.cmd(cmd, addrs)
+
+        self.socket.sendto(packet, addr)
+            
+
+    def connect(self):
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.socket.settimeout(self.socket_timeout)
+    
+
+    def disconnect(self):
+        
+        if self.socket == None:
+            raise IOError("Socket not connected")
+        self.socket.close()
+        return True
+
+
+
+
+
+
+
 def test_packages():
     packet = DMXPacket()
     print("emtpy packet")
     print("-" * 70)
-    print(DMXPacket.hexdump( DMXPacket.empty()))
+    print(hexdump( DMXPacket.empty()))
 
     indexes = [ 1, 2, 3,24  ]
     
     print("down, indexes: ", indexes)
     print("-" * 70)
-    print(DMXPacket.hexdump( DMXPacket.down( indexes)))
+    print(hexdump( DMXPacket.down( indexes)))
 
     print("up, indexes: ", indexes)
     print("-" * 70)
-    print(DMXPacket.hexdump( DMXPacket.up( indexes)))
+    print(hexdump( DMXPacket.up( indexes)))
 
     print("none, indexes: ", indexes)
     print("-" * 70)
-    print(DMXPacket.hexdump( DMXPacket.none( indexes)))
+    print(hexdump( DMXPacket.none( indexes)))
+
+
+def test_client(rounds: int = 10, wait_time: int = 1.0):
+
+    indexes = [ 1, 2, 3,24  ]
+    client = LampClient(src_addr = "192.168.1.92", dst_addr = "192.168.1.92")
+    client.connect()
+    for i in range(rounds):
+        print("sending round #%d" % i)
+        client.send_cmd("down",indexes)
+        time.sleep(wait_time)
+    client.disconnect()
 
 if __name__ == "__main__":
-
-    test_packages()
+    #test_packages()
+    test_client()
