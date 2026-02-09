@@ -69,7 +69,10 @@ class DMXPacket:
             _type_: _description_
         """
         pkg = copy.copy(DMXPacket.empty_packet)
-        indexes = list(map(lambda x: int(x), indexes))
+        if indexes: 
+            indexes = list(map(lambda x: int(x), indexes))
+        else:
+            indexes = []
 
         for index in indexes:
             # copy the command bytes (2) into the position.
