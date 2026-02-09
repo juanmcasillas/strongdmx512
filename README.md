@@ -147,3 +147,12 @@ These are the following tests to reverse engineer the packages
 ```
 
 Special buttons `EMERGENCY STOP` and `REARM` send empty packet.
+
+## Python command line interface.
+
+* You must send empty commands to start the power in the motor control box.
+* The command length must be 32 or greater in order to command all the motors. More motors, more pacakges.
+
+```
+python.exe .\strong_dmx.py -c up -i 1 -i 2 -i 3 -n 32
+```

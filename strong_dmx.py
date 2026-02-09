@@ -186,7 +186,7 @@ def test_client(rounds: int = 10, wait_time: int = 1.0):
 def app():
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--verbose", help="increase output verbosity", action="count")
-    parser.add_argument("-n", "--number", help="number of packets", default=16)
+    parser.add_argument("-n", "--number", help="number of packets", default=16, type=int)
     parser.add_argument("-p", "--preamble", help="preamble time (seconds)",default=2)
     parser.add_argument("-c", "--command", help="type of command", choices=['up', 'down', 'stop', 'rearm'])
     parser.add_argument("-i", "--indexes", help="indexes",choices=['1', '2', '3'], action='append')
@@ -200,6 +200,8 @@ def app():
     # disconnect
 
     client = LampClient(src_addr = "172.30.10.12", dst_addr = "172.30.10.12")
+    client = LampClient(src_addr = "192.168.72.2", dst_addr = "192.168.72.226")
+    
     client.connect()
     client.preamble(args.preamble, args.indexes)
     for i in range(args.number):
