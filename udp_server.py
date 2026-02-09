@@ -10,6 +10,7 @@
 # ############################################################################
 
 import socket
+import sys
 from hexdump import hexdump
 
 PORT: int = 53704
@@ -19,7 +20,12 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_socket.bind(('', 53704))
 
 while True:
-    message, address = server_socket.recvfrom(PKT_SIZE)
-    print("-------")
-    print("%d size" % len(message))
-    print(hexdump(message))
+    try:
+        message, address = server_socket.recvfrom(PKT_SIZE)
+        print("-------")
+        print("%d size" % len(message))
+        print(hexdump(message[0:64]))
+    except KeyboardInterrupt:
+            server_socket.close()
+            sys.exit(0)
+

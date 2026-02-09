@@ -17,8 +17,10 @@ import os
 import copy
 import socket
 import time
+import argparse
 
 from hexdump import hexdump
+
 
 class DMXPacket:
 
@@ -67,6 +69,7 @@ class DMXPacket:
             _type_: _description_
         """
         pkg = copy.copy(DMXPacket.empty_packet)
+        indexes = list(map(lambda x: int(x), indexes))
 
         for index in indexes:
             # copy the command bytes (2) into the position.
@@ -95,6 +98,7 @@ class LampClient:
         self.dst_addr = dst_addr
         self.dst_port = dst_port
         self.fps = fps
+        self.wait_time = 1.0/self.fps
         self.socket_timeout = socket_timeout
 
         self.socket = None
@@ -127,10 +131,19 @@ class LampClient:
         self.socket.close()
         return True
 
+    def wait(self):
+        time.sleep (self.wait_time)
 
+    def preamble(self, preamble=2.0, indexes=[]):
 
+        start_t = time.time()
+        while True:
+            self.send_cmd("none",indexes)
+            self.wait()
+            stop_t = time.time()
 
-
+            if (stop_t - start_t ) >= preamble:
+                break
 
 
 def test_packages():
@@ -157,7 +170,8 @@ def test_packages():
 def test_client(rounds: int = 10, wait_time: int = 1.0):
 
     indexes = [ 1, 2, 3,24  ]
-    client = LampClient(src_addr = "192.168.1.92", dst_addr = "192.168.1.92")
+    # client = LampClient(src_addr = "192.168.1.92", dst_addr = "192.168.1.92")
+    client = LampClient(src_addr = "172.30.10.12", dst_addr = "172.30.10.12")
     client.connect()
     for i in range(rounds):
         print("sending round #%d" % i)
@@ -165,6 +179,35 @@ def test_client(rounds: int = 10, wait_time: int = 1.0):
         time.sleep(wait_time)
     client.disconnect()
 
+
+def app():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-v", "--verbose", help="increase output verbosity", action="count")
+    parser.add_argument("-n", "--number", help="number of packets", default=16)
+    parser.add_argument("-p", "--preamble", help="preamble time (seconds)",default=2)
+    parser.add_argument("-c", "--command", help="type of command", choices=['up', 'down', 'stop', 'rearm'])
+    parser.add_argument("-i", "--indexes", help="indexes",choices=['1', '2', '3'], action='append')
+    
+    args = parser.parse_args()
+    
+    # start the connection, 
+    # send empty packets for X seconds
+    # send the command packets using the FPS (1/FPS) sleep time
+    # send emtpy packets for X seconds
+    # disconnect
+
+    client = LampClient(src_addr = "172.30.10.12", dst_addr = "172.30.10.12")
+    client.connect()
+    client.preamble(args.preamble, args.indexes)
+    for i in range(args.number):
+        client.send_cmd(args.command, args.indexes)
+        client.wait()
+    client.preamble(args.preamble, args.indexes)
+    client.disconnect()
+
+
+
 if __name__ == "__main__":
     #test_packages()
-    test_client()
+    #test_client()
+    app()
