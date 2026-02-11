@@ -3,6 +3,12 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# custom
+venv_p4a_master
+.buildozer
+dev/bin/*
+kivy_env
+
 # C extensions
 *.so
 

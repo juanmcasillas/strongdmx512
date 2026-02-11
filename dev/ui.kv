@@ -1,0 +1,31 @@
+<StrongDMX>:
+    BoxLayout: 
+        orientation: 'vertical'
+
+        TabbedPanel:
+            id: tp
+            do_default_tab: False
+
+        TabbedPanelItem:
+            id: tab_commands
+            text: 'Control'
+            on_release: app.commands(tab_commands)
+            FloatLayout:
+                CFloatLayout:
+                    id: tab_commands
+        
+        TabbedPanelItem:
+            id: tab_settings
+            text: 'Settings'
+            on_release: app.settings(tab_settings)
+            FloatLayout:
+                CFloatLayout:
+                    id: tab_settings
+
+        TabbedPanelItem:
+            id: tab_about
+            text: 'About'
+            on_release: app.about(tab_about)
+            FloatLayout:
+                CFloatLayout:
+                    id: tab_about

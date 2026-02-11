@@ -58,34 +58,57 @@ class DMXPacket:
     def empty():
         return copy.copy(DMXPacket.empty_packet)
 
-    def cmd(cmd_str, indexes):
+    # def cmd(cmd_str, indexes):
+    #     """Generate the proper package configured on DMXPacket.commands. If no indexes, return empty packet
+
+    #     Args:
+    #         cmd_str (_type_): _description_
+    #         indexes (_type_): _description_
+
+    #     Returns:
+    #         _type_: _description_
+    #     """
+    #     pkg = copy.copy(DMXPacket.empty_packet)
+    #     if indexes: 
+    #         indexes = list(map(lambda x: int(x), indexes))
+    #     else:
+    #         indexes = []
+
+    #     for index in indexes:
+    #         # copy the command bytes (2) into the position.
+
+    #         position = DMXPacket.payload_start + ((index-1)* 2)
+    #         pkg[position] = DMXPacket.commands[cmd_str][0]
+    #         pkg[position+1] = DMXPacket.commands[cmd_str][1]
+
+    #     return pkg
+    
+    def cmd(config):
         """Generate the proper package configured on DMXPacket.commands. If no indexes, return empty packet
+           config is a list with (index:int, cmd:str)
+           where cmd in [ 'up', 'down', 'none' ]
 
         Args:
-            cmd_str (_type_): _description_
-            indexes (_type_): _description_
+            config (_type_): _description_
 
         Returns:
             _type_: _description_
         """
         pkg = copy.copy(DMXPacket.empty_packet)
-        if indexes: 
-            indexes = list(map(lambda x: int(x), indexes))
-        else:
-            indexes = []
-
-        for index in indexes:
+    
+        for c in config:
+            index, cmd = c
             # copy the command bytes (2) into the position.
 
             position = DMXPacket.payload_start + ((index-1)* 2)
-            pkg[position] = DMXPacket.commands[cmd_str][0]
-            pkg[position+1] = DMXPacket.commands[cmd_str][1]
+            pkg[position] = DMXPacket.commands[cmd][0]
+            pkg[position+1] = DMXPacket.commands[cmd][1]
 
         return pkg
-    
-    def up(indexes):   return DMXPacket.cmd(indexes, "up")
-    def down(indexes): return DMXPacket.cmd(indexes, "down")
-    def none(indexes): return DMXPacket.cmd(indexes, "none")
+            
+    def up(indexes):   return DMXPacket.cmd( [ (i, "up")   for i in indexes ] )
+    def down(indexes): return DMXPacket.cmd( [ (i, "down") for i in indexes ] )
+    def none(indexes): return DMXPacket.cmd( [ (i, "none") for i in indexes ] )
 
 
 class LampClient:
@@ -106,21 +129,37 @@ class LampClient:
 
         self.socket = None
 
-    def send_cmd(
-            self,
-            cmd: str = "none",
-            addrs: list = []
-        ):
+    # def send_cmd(
+    #         self,
+    #         cmd: str = "none",
+    #         addrs: list = []
+    #     ):
+
+    #     if not self.socket:
+    #         raise IOError("Socket not connected")
+    #     addr = (self.dst_addr, self.dst_port)
+
+        
+    #     packet = DMXPacket.cmd(cmd, addrs)
+    #     self.socket.sendto(packet, addr)
+            
+
+    def send_cmd(self, config):
+        """send various commands in the same packet.
+
+        Args:
+            config (_type_): _description_
+
+        Raises:
+            IOError: _description_
+        """
 
         if not self.socket:
             raise IOError("Socket not connected")
         addr = (self.dst_addr, self.dst_port)
 
-        
-        packet = DMXPacket.cmd(cmd, addrs)
-
+        packet = DMXPacket.cmd(config)
         self.socket.sendto(packet, addr)
-            
 
     def connect(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -139,9 +178,11 @@ class LampClient:
 
     def preamble(self, preamble=2.0, indexes=[]):
 
+        config = [ (i, "none") for i in indexes ]
+
         start_t = time.time()
         while True:
-            self.send_cmd("none",indexes)
+            self.send_cmd( config )
             self.wait()
             stop_t = time.time()
 
@@ -170,15 +211,23 @@ def test_packages():
     print(hexdump( DMXPacket.none( indexes)))
 
 
+def test_list():
+    packet = DMXPacket()
+    config = [ (1, "up"), (2, "up"), (3, "down"), (24, "down") ]
+    print("config: ", config)
+    print("-" * 70)
+    print(hexdump( DMXPacket.cmd( config )))
+
+
 def test_client(rounds: int = 10, wait_time: int = 1.0):
 
-    indexes = [ 1, 2, 3,24  ]
+    config = [ (1, "up"), (2, "up"), (3, "down"), (24, "down") ]
     # client = LampClient(src_addr = "192.168.1.92", dst_addr = "192.168.1.92")
     client = LampClient(src_addr = "172.30.10.12", dst_addr = "172.30.10.12")
     client.connect()
     for i in range(rounds):
         print("sending round #%d" % i)
-        client.send_cmd("down",indexes)
+        client.send_cmd(config)
         time.sleep(wait_time)
     client.disconnect()
 
@@ -188,11 +237,13 @@ def app():
     parser.add_argument("-v", "--verbose", help="increase output verbosity", action="count")
     parser.add_argument("-n", "--number", help="number of packets", default=16, type=int)
     parser.add_argument("-p", "--preamble", help="preamble time (seconds)",default=2)
-    parser.add_argument("-c", "--command", help="type of command", choices=['up', 'down', 'stop', 'rearm'])
-    parser.add_argument("-i", "--indexes", help="indexes",choices=['1', '2', '3'], action='append')
+    parser.add_argument("-c", "--command", help="type of command", choices=['up', 'down', 'stop', 'rearm', 'none'], default="none")
+    parser.add_argument("-i", "--indexes", help="indexes",choices=['1', '2', '3'], action='append', default=[])
     
     args = parser.parse_args()
     
+    args.indexes = list(map(lambda x: int(x), args.indexes))
+
     # start the connection, 
     # send empty packets for X seconds
     # send the command packets using the FPS (1/FPS) sleep time
@@ -200,12 +251,18 @@ def app():
     # disconnect
 
     client = LampClient(src_addr = "172.30.10.12", dst_addr = "172.30.10.12")
-    client = LampClient(src_addr = "192.168.72.2", dst_addr = "192.168.72.226")
+    ##client = LampClient(src_addr = "192.168.72.2", dst_addr = "192.168.72.226")
     
+    ## build the config:
+
+    config = []
+    for i in args.indexes:
+        config.append((i, args.command))
+
     client.connect()
     client.preamble(args.preamble, args.indexes)
     for i in range(args.number):
-        client.send_cmd(args.command, args.indexes)
+        client.send_cmd(config)
         client.wait()
     client.preamble(args.preamble, args.indexes)
     client.disconnect()
@@ -214,5 +271,6 @@ def app():
 
 if __name__ == "__main__":
     #test_packages()
+    #test_list()
     #test_client()
     app()

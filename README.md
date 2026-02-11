@@ -156,3 +156,79 @@ Special buttons `EMERGENCY STOP` and `REARM` send empty packet.
 ```
 python.exe .\strong_dmx.py -c up -i 1 -i 2 -i 3 -n 32
 ```
+
+
+## Kivy
+
+* `python -m pip install --upgrade pip setuptools virtualenv`
+* `python -m venv kivy_env`
+* `.\kivy_env\Scripts\activate` windows default cmd
+* `python -m pip install "kivy[base]" kivy_examples` base installation
+* `python kivy_env\share\kivy-examples\demo\showcase\main.py` to test the demos
+
+
+## Build for android on Windows requires WSL.
+
+* Update the WSL distro
+* Install the same python version (3.10)
+
+## Install the python3.10 on WSL
+
+```
+104  apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget libsqlite3-dev libbz2-dev -y
+105  pwd
+106  cd /tmp
+107  wget https://www.python.org/ftp/python/3.12.12/Python-3.12.12.tgz
+108  tar -xf Python-3.12.12.tgz
+109  cd Python-3.12.12
+110  ./configure --enable-optimizations
+111  make -j $(nproc)
+112  make altinstall
+113  python3.10 --version
+```
+
+
+ ## Buildozer and Kivy
+
+```
+python kivy_venv\share\kivy-examples\demo\showcase\main.py
+```
+
+
+NOTE: only DEBUG apk can be deployed
+
+https://buildozer.readthedocs.io/en/latest/installation/
+https://github.com/kivy/kivy/wiki/Using-Buildozer-on-windows-10-using-WSL
+
+```
+apt install -y git zip unzip openjdk-17-jdk python3-pip \
+python3-virtualenv autoconf libtool pkg-config zlib1g-dev \
+libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev \
+libssl-dev automake autopoint gettext
+```
+
+```
+update-alternatives --config java
+update-alternatives --config javac
+
+add to .bashrc . "$HOME/.cargo/env" (on install dir for the user)
+
+python3.10 -m venv venv_p4a_master
+source venv_p4a_master/bin/activate
+pip install buildozer setuptools  cython==0.29.34
+```
+
+https://buildozer.readthedocs.io/en/latest/quickstart/
+
+```
+buildozer android deploy run logcat
+buildozer -v android debug deploy run logcat
+buildozer -v android deploy run
+```
+
+install this on windows https://github.com/dorssel/usbipd-win/releases
+wsl --shutdown
+kill the adb server fist C:\platform-tools\adb kill-server
+https://devblogs.microsoft.com/commandline/connecting-usb-devices-to-wsl/
+& 'C:\Program Files\usbipd-win\usbipd.exe' list
+& 'C:\Program Files\usbipd-win\usbipd.exe' attach --wsl --busid 1-1
