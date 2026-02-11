@@ -1,4 +1,39 @@
-<StrongDMX>:
+
+
+<ServerInputField@BoxLayout>:
+    orientation: "vertical"
+    BoxLayout:
+     
+
+        Label: 
+            text: "Server IP"
+        TextInput:
+            size_hint_x: 10
+            text: app.server_ip
+
+<PortInputField@BoxLayout>:
+    orientation: "vertical"
+    BoxLayout:
+     
+
+        Label: 
+            text: "Server Port"
+        TextInput:
+            size_hint_x: 10
+            text: app.server_port
+
+
+<ImgButton@Button>:
+    my_state: 0
+    background_normal: "circle_green_none.png"
+    background_down: "circle_green_none.png"
+    size_hint_y: None
+    height: self.width
+
+
+    on_press: app.change_button(self)
+
+<UILayout>:
     BoxLayout: 
         orientation: 'vertical'
 
@@ -6,26 +41,101 @@
             id: tp
             do_default_tab: False
 
-        TabbedPanelItem:
-            id: tab_commands
-            text: 'Control'
-            on_release: app.commands(tab_commands)
-            FloatLayout:
-                CFloatLayout:
+            TabbedPanelItem:
+                id: tab_commands
+                text: 'Control'
+                on_release: app.commands(tab_commands)
+                GridLayout:
+                    cols: 1
+                    rows: 2
                     id: tab_commands
-        
-        TabbedPanelItem:
-            id: tab_settings
-            text: 'Settings'
-            on_release: app.settings(tab_settings)
-            FloatLayout:
-                CFloatLayout:
-                    id: tab_settings
+                    GridLayout: 
+                        cols: 3
+                        rows: 2
+                        BoxLayout: 
+                            padding: 50
+                            orientation: "vertical"
+                            ImgButton: 
+                                id: button_1
+                            Label: 
+                                text: "1"
+                        BoxLayout: 
+                            padding: 50
+                            orientation: "vertical"
+                            ImgButton: 
+                                id: button_2
+                            Label: 
+                                text: "2"
+                        BoxLayout: 
+                            padding: 50
+                            orientation: "vertical"
+                            ImgButton: 
+                                id: button_3
+                            Label: 
+                                text: "3"
 
-        TabbedPanelItem:
-            id: tab_about
-            text: 'About'
-            on_release: app.about(tab_about)
-            FloatLayout:
-                CFloatLayout:
+                    GridLayout: 
+                        cols: 2
+                        rows: 1
+                        padding: 50
+                        spacing: 10
+                        Button: 
+                            background_color: (1.0, 0.0, 0.0, 1.0)
+                            text: "STOP"
+                        Button: 
+                            background_color: (0.0, 1.0, 0.0, 1.0)
+                            text: "GO"
+
+            TabbedPanelItem:
+                id: tab_settings
+                text: 'Settings'
+                on_release: app.settings(tab_settings)
+                FloatLayout:
+                    id: tab_settings
+                    GridLayout: 
+                        padding: 10
+                        rows: 4
+                        cols: 1
+                        BoxLayout: 
+                            height: "40dp"
+                            size_hint_y: None
+                            Label: 
+                                halign: 'right'
+                                text: "Configure Server Settings"
+                                                
+                        BoxLayout: 
+                            height: "40dp"
+                            size_hint_y: None
+                            Label: 
+                                text: "Server IP"
+                            TextInput:
+                                size_hint_x: 5
+                                text: app.server_ip
+                        BoxLayout: 
+                            height: "40dp"
+                            size_hint_y: None
+                            Label: 
+                                text: "Server Port"
+                            TextInput:
+                                size_hint_x: 5
+                                text: app.server_port
+                        BoxLayout: 
+                            padding: 20
+                            size_hint_y: None
+                            Button: 
+                                text: "Apply"
+
+            TabbedPanelItem:
+                id: tab_about
+                text: 'About'
+                on_release: app.about(tab_about)
+                FloatLayout:
                     id: tab_about
+                    Label: 
+                        valign: "middle"
+                        halign: "center"
+                        markup: True
+                        text: "[b]StrongDMX512 GUI App[/b]\n\n(C) Juan M. Casillas 2026\n\n[u][ref=hlink]Github repository[/ref][/u]"
+                        on_ref_press: 
+                            import webbrowser
+                            webbrowser.open('https://github.com/juanmcasillas/strongdmx512')
