@@ -160,6 +160,21 @@ python.exe .\strong_dmx.py -c up -i 1 -i 2 -i 3 -n 32
 
 ## Kivy
 
+
+### MacOs 10.13.6
+
+https://kivy.org/doc/stable/installation/installation-osx.html#using-homebrew-with-pip
+
+`source dev/init_kivy_mac.sh`
+
+```
+pushd /Applications/Kivy.app/Contents/Resources/venv/bin
+source activate
+source kivy_activate
+popd
+```
+
+
 * `python -m pip install --upgrade pip setuptools virtualenv`
 * `python -m venv kivy_env`
 * `.\kivy_env\Scripts\activate` windows default cmd
