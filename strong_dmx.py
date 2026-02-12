@@ -126,24 +126,10 @@ class LampClient:
         self.fps = fps
         self.wait_time = 1.0/self.fps
         self.socket_timeout = socket_timeout
-
         self.socket = None
-
-    # def send_cmd(
-    #         self,
-    #         cmd: str = "none",
-    #         addrs: list = []
-    #     ):
-
-    #     if not self.socket:
-    #         raise IOError("Socket not connected")
-    #     addr = (self.dst_addr, self.dst_port)
-
         
-    #     packet = DMXPacket.cmd(cmd, addrs)
-    #     self.socket.sendto(packet, addr)
-            
-
+        self.packet = DMXPacket.empty()
+    
     def send_cmd(self, config):
         """send various commands in the same packet.
 
@@ -158,8 +144,29 @@ class LampClient:
             raise IOError("Socket not connected")
         addr = (self.dst_addr, self.dst_port)
 
+
         packet = DMXPacket.cmd(config)
         self.socket.sendto(packet, addr)
+
+    def send_cmd_internal(self, arg):
+        """send various commands in the same packet.
+
+        Args:
+            config (_type_): _description_
+
+        Raises:
+            IOError: _description_
+        """
+
+        if not self.socket:
+            raise IOError("Socket not connected")
+        addr = (self.dst_addr, self.dst_port)
+    
+        packet = self.packet
+        self.socket.sendto(packet, addr)
+        print("sending commands internal")
+
+
 
     def connect(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -188,6 +195,14 @@ class LampClient:
 
             if (stop_t - start_t ) >= preamble:
                 break
+
+    def send_keep_alive(self, arg):
+        print("sending keep alive")
+        packet = DMXPacket.empty()
+        if not self.socket:
+            raise IOError("Socket not connected")
+        addr = (self.dst_addr, self.dst_port)
+        self.socket.sendto(packet, addr)
 
 
 def test_packages():

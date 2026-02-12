@@ -15,6 +15,7 @@ __version__ = "1.0.1"
 
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
+from kivy.clock import Clock
 
 from kivy.app import App
 from kivy.uix.button import Button
@@ -26,6 +27,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ObjectProperty
 from kivy.uix.popup import Popup
 
+from strong_dmx import DMXPacket, LampClient
 
 PASSWORD = "1234"
 
@@ -58,16 +60,13 @@ class loginWindow(Screen):
         else:
             # switching the current screen to display validation result
             self.manager.current = 'mainWindow'
-
             # reset TextInput widget
+            # start the app idle loop
             self.pwd.text = ""
-
+            self.app.create_client()
+    
 class mainWindow(Screen):
     pass
-
-
-
-
 
 
 kv = Builder.load_file('ui.kv')
@@ -75,6 +74,7 @@ kv = Builder.load_file('ui.kv')
 class StrongDMXApp(App):
 
     server_ip = "192.168.72.226"
+    server_ip = "192.168.1.92"
     server_port = "53704"
 
     button_rearm_color = (50/88, 50/88, 0.0, 1.0)
@@ -84,20 +84,15 @@ class StrongDMXApp(App):
         "res/img/circle_green_up.png",     # 1
         "res/img/circle_green_down.png"    # 2
     ]
+    button_state_cmd = { 0: 'none', 1: 'up', 2: 'down' }
 
     def build(self):
-        sm = ScreenManager()
-        sm.add_widget(loginWindow(name='loginWindow'))
-        sm.add_widget(mainWindow(name='mainWindow'))
-        return sm
-
-    pass
-    def commands(self, obj):
-        pass
-    def settings(self, obj):
-        pass
-    def about(self, obj):
-        pass
+        self.sm = ScreenManager()
+        lw = loginWindow(name='loginWindow')
+        lw.app = self        
+        self.sm.add_widget(lw)
+        self.sm.add_widget(mainWindow(name='mainWindow'))
+        return self.sm
 
     def change_button(self, button):
         button.my_state = (button.my_state + 1) % 3
@@ -105,18 +100,23 @@ class StrongDMXApp(App):
         button.background_down = self.button_img[ button.my_state  ]
 
     def change_stop_rearm_button(self, button):
-        
+
+        mw = self.sm.get_screen("mainWindow")
         if button.my_state == 0:
             # STOP button
-            print("stopping")
             button.background_color = self.button_rearm_color
             button.text = "REARM"
-            
+            self.destroy_client()
+            print("stopping")
+            mw.ids.go_button.disabled = True
+
         if button.my_state == 1:
             # REARM button
             print("rearm")
             button.background_color = self.button_stop_color
             button.text = "STOP"
+            self.create_client()
+            mw.ids.go_button.disabled = False
         
         button.my_state = (button.my_state + 1) % 2
         
@@ -132,8 +132,41 @@ class StrongDMXApp(App):
         else:
             self.server_ip = ip.text
             self.server_port = port_i
-            # close and open again
-            
+            self.destroy_client()
+            self.create_client()
+
+    ## manager interface
+    def destroy_client(self):
+        Clock.unschedule(self.client.schedule)
+        self.client.disconnect()
+        del self.client
+
+    def create_client(self):
+        self.client = LampClient(
+            src_addr = "0.0.0.0", 
+            dst_addr = self.server_ip,
+            dst_port = int(self.server_port)
+            )
+        self.client.connect()
+        self.client.schedule = Clock.schedule_interval(self.client.send_keep_alive, self.client.wait_time)
+        print("create client done")
+
+    def start_sending_commands(self):
+        mw = self.sm.get_screen("mainWindow")
+        
+        config = [ 
+                ( 1, self.button_state_cmd[mw.ids.button_1.my_state] ),
+                ( 2, self.button_state_cmd[mw.ids.button_2.my_state] ),
+                ( 3, self.button_state_cmd[mw.ids.button_3.my_state] ),
+        ]
+        Clock.unschedule(self.client.schedule)
+        self.client.packet = DMXPacket.cmd(config)
+        self.client.schedule = Clock.schedule_interval(self.client.send_cmd_internal, self.client.wait_time)
+        
+
+    def stop_sending_commands(self):
+        Clock.unschedule(self.client.schedule)
+        self.client.schedule = Clock.schedule_interval(self.client.send_keep_alive, self.client.wait_time)
 
 if __name__ == "__main__":
     StrongDMXApp().run()
