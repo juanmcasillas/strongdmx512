@@ -1,39 +1,61 @@
 
 
-<ServerInputField@BoxLayout>:
-    orientation: "vertical"
-    BoxLayout:
-     
+<loginWindow>:
+    pwd : pwd
+    FloatLayout:
+        size: root.width, root.height
 
-        Label: 
-            text: "Server IP"
+        Label:
+            markup: True
+            text: "[b]StrongDMX512 GUI App[/b]"
+            size_hint : 0.2, 0.05
+            pos_hint : {"x" : 0.43, "top" : 0.9}
+        Label:
+            text : "Password: "
+            size_hint : 0.2, 0.05
+            pos_hint : {"x" : 0.25, "top" : 0.7}
         TextInput:
-            size_hint_x: 10
-            text: app.server_ip
+            id : pwd
+            multiline :False
+            size_hint : 0.3, 0.05
+            password: True
+            pos_hint : {"x" : 0.45, "top" : 0.7}
+        Button:
+            text : "Login"
+            size_hint : 0.3, 0.1
+            pos_hint : {"x" : 0.39, "top" : 0.2}
+            on_release: 
+                root.validate()
+                root.manager.transition.direction = "up"
 
-<PortInputField@BoxLayout>:
-    orientation: "vertical"
-    BoxLayout:
-     
+# GUI for pop up window
+<P>:
+    Label:
+        text : "Please enter valid information"
+        size_hint : 0.2, 0.1
+        pos_hint : {"x" : 0.3, "top" : 0.8}
 
-        Label: 
-            text: "Server Port"
-        TextInput:
-            size_hint_x: 10
-            text: app.server_port
 
 
 <ImgButton@Button>:
     my_state: 0
-    background_normal: "circle_green_none.png"
-    background_down: "circle_green_none.png"
+    background_normal: "res/img/circle_green_none.png"
+    background_down: "res/img/circle_green_none.png"
     size_hint_y: None
     height: self.width
 
+    on_release: app.change_button(self)
 
-    on_press: app.change_button(self)
+<StopRearmButton@Button>:
+    my_state: 0
+    background_normal: ''
+    height: self.width
+    background_color: app.button_stop_color
+    text: "STOP"
+    on_press: app.change_stop_rearm_button(self)
 
-<UILayout>:
+
+<mainWindow>:
     BoxLayout: 
         orientation: 'vertical'
 
@@ -79,9 +101,7 @@
                         rows: 1
                         padding: 50
                         spacing: 10
-                        Button: 
-                            background_color: (1.0, 0.0, 0.0, 1.0)
-                            text: "STOP"
+                        StopRearmButton: 
                         Button: 
                             background_color: (0.0, 1.0, 0.0, 1.0)
                             text: "GO"
@@ -111,6 +131,8 @@
                             TextInput:
                                 size_hint_x: 5
                                 text: app.server_ip
+                                id: server_ip
+
                         BoxLayout: 
                             height: "40dp"
                             size_hint_y: None
@@ -119,11 +141,13 @@
                             TextInput:
                                 size_hint_x: 5
                                 text: app.server_port
+                                id: server_port
                         BoxLayout: 
                             padding: 20
                             size_hint_y: None
                             Button: 
                                 text: "Apply"
+                                on_release: app.apply_settings(server_ip, server_port)
 
             TabbedPanelItem:
                 id: tab_about
