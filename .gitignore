@@ -8,6 +8,8 @@ venv_p4a_master
 .buildozer
 dev/bin/*
 kivy_env
+main.py
+bin/
 
 # C extensions
 *.so

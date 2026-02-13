@@ -1,1 +1,0 @@
-strong_dmx_gui.py

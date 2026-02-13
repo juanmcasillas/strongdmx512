@@ -1,10 +1,10 @@
 [app]
 
 # (str) Title of your application
-title = Senado Test 01 App
+title = StrongDMX
 
 # (str) Package name
-package.name = sentest01
+package.name = strongdmx
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = es.senado
@@ -22,7 +22,7 @@ source.include_exts = py,png,jpg,kv,atlas
 #source.exclude_exts = spec
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-#source.exclude_dirs = tests, bin, venv
+source.exclude_dirs = tests, bin, venv, kivy_env, venv_p4a_master, capture, __pycache__, dev, docs, traces 
 
 # (list) List of exclusions using pattern matching
 # Do not prefix with './'
@@ -95,7 +95,7 @@ fullscreen = 0
 
 # (list) Permissions
 # (See https://python-for-android.readthedocs.io/en/latest/buildoptions/#build-options-1 for all the supported syntaxes and properties)
-#android.permissions = android.permission.INTERNET, (name=android.permission.WRITE_EXTERNAL_STORAGE;maxSdkVersion=18)
+android.permissions = android.permission.INTERNET, (name=android.permission.WRITE_EXTERNAL_STORAGE;maxSdkVersion=18)
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
