@@ -74,9 +74,7 @@
                 GridLayout:
                     cols: 1
                     rows: 2
-                    spacing_vertical: 0.2
                     GridLayout: 
-                        background_color: (0.1,0,0,1)
                         cols: 3
                         rows: 2
                         BoxLayout: 
@@ -85,21 +83,23 @@
                             ImgButton: 
                                 id: button_1
                             Label: 
-                                text: "1"
+                                text: "Fondo"
                         BoxLayout: 
                             padding: 50
                             orientation: "vertical"
                             ImgButton: 
                                 id: button_2
                             Label: 
-                                text: "2"
+                                text: "Central"
                         BoxLayout: 
                             padding: 50
                             orientation: "vertical"
                             ImgButton: 
                                 id: button_3
                             Label: 
-                                text: "3"
+                                text: "Presidencia"
+                        Label: 
+                            text: ""
 
                     GridLayout:
                         cols: 2
@@ -116,10 +116,31 @@
                             on_press: app.start_sending_commands()
                             on_release: app.stop_sending_commands()
 
+
+            TabbedPanelItem:
+                id: tab_about
+                text: 'About'
+                
+                FloatLayout:
+                    id: tab_about
+                    Label: 
+                        valign: "middle"
+                        halign: "center"
+                        markup: True
+                        text: "[b]StrongDMX512 GUI App[/b]\n\n(C) Juan M. Casillas 2026\n\n[u][ref=hlink]Github repository[/ref][/u]"
+                        on_ref_press: 
+                            import webbrowser
+                            webbrowser.open('https://github.com/juanmcasillas/strongdmx512')
+
             TabbedPanelItem:
                 id: tab_settings
                 text: 'Settings'
-                
+                # disabled and hidden by default
+                visible: False
+                size_hint_x: 1 if self.visible else 0
+                opacity: 1 if self.visible else 0
+                disabled: not self.visible
+
                 FloatLayout:
                     id: tab_settings
                     GridLayout: 
@@ -157,19 +178,4 @@
                             size_hint_y: None
                             Button: 
                                 text: "Apply"
-                                on_release: app.apply_settings(server_ip, server_port)
-
-            TabbedPanelItem:
-                id: tab_about
-                text: 'About'
-                
-                FloatLayout:
-                    id: tab_about
-                    Label: 
-                        valign: "middle"
-                        halign: "center"
-                        markup: True
-                        text: "[b]StrongDMX512 GUI App[/b]\n\n(C) Juan M. Casillas 2026\n\n[u][ref=hlink]Github repository[/ref][/u]"
-                        on_ref_press: 
-                            import webbrowser
-                            webbrowser.open('https://github.com/juanmcasillas/strongdmx512')
+                                on_release: app.apply_settings(server_ip, server_port)                            
