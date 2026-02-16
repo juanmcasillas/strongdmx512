@@ -14,33 +14,33 @@
         Label:
             markup: True
             text: "[b]StrongDMX512 GUI App[/b]"
-            size_hint : 0.2, 0.05
-            pos_hint : {"x" : 0.43, "top" : 0.9}
-        Label:
-            text : "Password: "
-            size_hint : 0.2, 0.05
-            pos_hint : {"x" : 0.25, "top" : 0.7}
+            size_hint : 0.5, 0.05
+            pos_hint : {"x" : 0.25, "top" : 0.75}
+
         TextInput:
             id : pwd
             multiline :False
-            size_hint : 0.3, 0.05
+            size_hint : 0.5, 0.03
             password: True
-            pos_hint : {"x" : 0.45, "top" : 0.7}
+            pos_hint : {"x" : 0.25, "top" : 0.70}
         Button:
             text : "Login"
-            size_hint : 0.3, 0.1
-            pos_hint : {"x" : 0.39, "top" : 0.2}
+            size_hint : 0.5, 0.05
+            pos_hint : {"x" : 0.25, "top" : 0.65}
             on_release: 
                 root.validate()
                 root.manager.transition.direction = "up"
-                
+        Image: 
+            source: "res/img/escudo.png"
+            size_hint : 0.4, 0.4
+            pos_hint : {"x" : 0.30, "top" : 0.55}
 
 # GUI for pop up window
 <P>:
     Label:
         text : "Please enter valid information"
-        size_hint : 0.2, 0.1
-        pos_hint : {"x" : 0.3, "top" : 0.8}
+        size_hint : 0.5, 0.5
+        pos_hint : {"x" : 0.25, "top" : 0.8}
 
 
 
@@ -65,20 +65,18 @@
 <mainWindow>:
     BoxLayout: 
         orientation: 'vertical'
-
         TabbedPanel:
             id: tp
             do_default_tab: False
-
             TabbedPanelItem:
                 id: tab_commands
                 text: 'Control'
-               
                 GridLayout:
                     cols: 1
                     rows: 2
-                    id: tab_commands_gl
+                    spacing_vertical: 0.2
                     GridLayout: 
+                        background_color: (0.1,0,0,1)
                         cols: 3
                         rows: 2
                         BoxLayout: 
@@ -103,9 +101,10 @@
                             Label: 
                                 text: "3"
 
-                    GridLayout: 
+                    GridLayout:
                         cols: 2
                         rows: 1
+                        size_hint : 0.5, 0.3
                         padding: 50
                         spacing: 10
                         StopRearmButton: 

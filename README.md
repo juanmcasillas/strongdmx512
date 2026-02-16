@@ -247,3 +247,8 @@ kill the adb server fist C:\platform-tools\adb kill-server
 https://devblogs.microsoft.com/commandline/connecting-usb-devices-to-wsl/
 & 'C:\Program Files\usbipd-win\usbipd.exe' list
 & 'C:\Program Files\usbipd-win\usbipd.exe' attach --wsl --busid 1-1
+
+
+pixel 2 screen size: 1920x1080 or 2880x1440  441 ppi
+python .\strong_dmx_gui.py --size=1080x1920
+python .\strong_dmx_gui.py --size=648x1152 

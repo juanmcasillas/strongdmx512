@@ -36,7 +36,7 @@ PASSWORD = "1234"
 def popFun():
     show = P()
     window = Popup(title = "Warning", content = show,
-                   size_hint = (None, None), size = (300, 300))
+                   size_hint = (None, None), size = (600, 400))
     window.open()
 
 class PopupWindow(Widget):
@@ -74,7 +74,7 @@ kv = Builder.load_file('ui.kv')
 class StrongDMXApp(App):
 
     server_ip = "192.168.72.226"
-    server_ip = "192.168.1.92"
+    #server_ip = "192.168.1.92"
     server_port = "53704"
 
     button_rearm_color = (50/88, 50/88, 0.0, 1.0)
