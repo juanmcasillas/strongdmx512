@@ -117,8 +117,9 @@ class LampClient:
             src_addr: str = "192.168.72.228",
             dst_addr: str = "192.168.72.226",
             dst_port: int = 53704,
-            fps: int = 8,
-            socket_timeout: int = 1.0,
+            # fps: int = 8,
+            # fps: int = 4,
+            socket_timeout: int = 3.0,
             debug: bool = False
         ):
         self.src_addr = src_addr

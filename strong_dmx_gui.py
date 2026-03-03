@@ -29,8 +29,12 @@ from kivy.uix.popup import Popup
 
 from strong_dmx import DMXPacket, LampClient
 
-PASSWORD = "1234"
-DEBUG = True
+# GLOBAL CONFIGURATION
+
+PASSWORD    = "1234"
+DEBUG       = False
+SERVER_IP   = "192.168.72.226"
+SERVER_PORT = "53704"
 
 # class to call the popup function
 
@@ -77,11 +81,14 @@ kv = Builder.load_file('ui.kv')
 
 class StrongDMXApp(App):
     global DEBUG
+    global SERVER_IP 
+    global SERVER_PORT
     DEBUG = DEBUG
+
     #server_ip = "192.168.72.226"
     #server_ip = "192.168.1.92"
-    server_ip = "172.30.10.12"
-    server_port = "53704"
+    server_ip = SERVER_IP
+    server_port = SERVER_PORT
 
     button_rearm_color = (50/88, 50/88, 0.0, 1.0)
     button_stop_color = (255/88, 0.0, 0.0, 1.0)

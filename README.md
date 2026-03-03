@@ -212,8 +212,8 @@ python kivy_venv\share\kivy-examples\demo\showcase\main.py
 
 NOTE: only DEBUG apk can be deployed
 
-https://buildozer.readthedocs.io/en/latest/installation/
-https://github.com/kivy/kivy/wiki/Using-Buildozer-on-windows-10-using-WSL
+* [https://buildozer.readthedocs.io/en/latest/installation/](https://buildozer.readthedocs.io/en/latest/installation/)
+* [https://github.com/kivy/kivy/wiki/Using-Buildozer-on-windows-10-using-WSL](https://github.com/kivy/kivy/wiki/Using-Buildozer-on-windows-10-using-WSL)
 
 ```
 apt install -y git zip unzip openjdk-17-jdk python3-pip \
@@ -233,7 +233,8 @@ source venv_p4a_master/bin/activate
 pip install buildozer setuptools  cython==0.29.34
 ```
 
-https://buildozer.readthedocs.io/en/latest/quickstart/
+* [https://buildozer.readthedocs.io/en/latest/quickstart/](https://buildozer.readthedocs.io/en/latest/quickstart/)
+
 
 ```
 buildozer android deploy run logcat
@@ -241,6 +242,7 @@ buildozer -v android debug deploy run logcat
 buildozer -v android deploy run
 ```
 
+```
 install this on windows https://github.com/dorssel/usbipd-win/releases
 wsl --shutdown
 kill the adb server fist C:\platform-tools\adb kill-server
@@ -248,7 +250,7 @@ https://devblogs.microsoft.com/commandline/connecting-usb-devices-to-wsl/
 & 'C:\Program Files\usbipd-win\usbipd.exe' list
 & 'C:\Program Files\usbipd-win\usbipd.exe' attach --wsl --busid 1-1
 
-
 pixel 2 screen size: 1920x1080 or 2880x1440  441 ppi
 python .\strong_dmx_gui.py --size=1080x1920
 python .\strong_dmx_gui.py --size=648x1152 
+```
